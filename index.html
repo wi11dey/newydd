@@ -94,14 +94,13 @@
      .textarea-container {
          display: grid;
          grid-template-columns: 1fr 1fr;
-         min-height: 300px;
          position: relative;
+         align-items: stretch;
      }
 
      .textarea-wrapper {
          position: relative;
-         display: flex;
-         flex-direction: column;
+         display: block;
      }
 
      .textarea-wrapper:first-child {
@@ -109,7 +108,7 @@
      }
 
      textarea {
-         flex: 1;
+         width: 100%;
          padding: 20px;
          border: none;
          font-family: 'Roboto', sans-serif;
@@ -118,6 +117,9 @@
          resize: none;
          outline: none;
          background: transparent;
+         min-height: 300px;
+         overflow: hidden;
+         display: block;
      }
 
      #original {
@@ -206,6 +208,7 @@
              padding: 16px;
              font-size: 18px;
              line-height: 24px;
+             width: 100%;
          }
 
          #original::placeholder {
@@ -248,7 +251,7 @@
         <div class="translator-wrapper">
             <div class="textarea-container">
                 <div class="textarea-wrapper">
-                    <textarea id="original" placeholder="Enter text" oninput="updateTranslation()"></textarea>
+                    <textarea id="original" placeholder="Enter text" oninput="updateTranslation()" onpaste="setTimeout(updateTranslation, 0)"></textarea>
                     <div class="tools">
                         <button class="tool-button" onclick="clearText()" title="Clear">
                             <svg viewBox="0 0 24 24">
@@ -301,16 +304,35 @@
                 .replaceAll(/Y/g, "I");
         }
 
+     function autoResize(textarea) {
+         // Reset height to auto to get the correct scrollHeight
+         textarea.style.height = 'auto';
+         // Set the height to scrollHeight to fit all content
+         const newHeight = Math.max(300, textarea.scrollHeight);
+         textarea.style.height = newHeight + 'px';
+         
+         // Also resize the companion textarea to match heights
+         const original = document.getElementById('original');
+         const translated = document.getElementById('new');
+         const maxHeight = Math.max(original.scrollHeight, translated.scrollHeight, 300);
+         original.style.height = maxHeight + 'px';
+         translated.style.height = maxHeight + 'px';
+     }
+
      function updateTranslation() {
          const original = document.getElementById('original');
          const translated = document.getElementById('new');
             
             translated.value = neuz(original.value);
+            autoResize(original);
+            autoResize(translated);
         }
 
         function clearText() {
             document.getElementById('original').value = '';
             document.getElementById('new').value = '';
+            autoResize(document.getElementById('original'));
+            autoResize(document.getElementById('new'));
         }
 
         function copyTranslation() {
@@ -325,6 +347,12 @@
                 button.style.backgroundColor = 'transparent';
             }, 200);
         }
+        
+        // Initialize auto-resize on page load
+        window.addEventListener('load', () => {
+            autoResize(document.getElementById('original'));
+            autoResize(document.getElementById('new'));
+        });
     </script>
 </body>
 </html>

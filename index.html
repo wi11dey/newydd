@@ -301,7 +301,8 @@
                 .replaceAll(/u/g, "y")
                 .replaceAll(/U/g, "Y")
                 .replaceAll(/w/g, "u")
-                .replaceAll(/W/g, "U");
+                .replaceAll(/W/g, "U")
+		.replaceAll(/uı/g, "μ");
         }
 
      function autoResize(textarea) {
